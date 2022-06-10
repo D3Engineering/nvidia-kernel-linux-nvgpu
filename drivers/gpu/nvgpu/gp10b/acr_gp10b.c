@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -19,33 +19,34 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#ifndef NVGPU_BUG_H
-#define NVGPU_BUG_H
 
-#ifdef __KERNEL__
-#include <linux/bug.h>
-/*
- * Define an assert macro that code within nvgpu can use.
- *
- * The goal of this macro is for debugging but what that means varies from OS
- * to OS. On Linux wee don't want to BUG() for general driver misbehaving. BUG()
- * is a very heavy handed tool - in fact there's probably no where within the
- * nvgpu core code where it makes sense to use a BUG() when running under Linux.
- *
- * However, on QNX (and POSIX) BUG() will just kill the current process. This
- * means we can use it for handling bugs in nvgpu.
- *
- * As a result this macro varies depending on platform.
- */
-#define nvgpu_assert(cond)	((void) WARN_ON(!(cond)))
-#define nvgpu_do_assert_print(g, fmt, arg...)				\
-	do {								\
-		nvgpu_err(g, fmt, ##arg);				\
-	} while (false)
-#elif defined(__NVGPU_POSIX__)
-#include <nvgpu/posix/bug.h>
-#else
-#include <nvgpu_rmos/include/bug.h>
-#endif
+#include <nvgpu/types.h>
+#include <nvgpu/gk20a.h>
+#include <nvgpu/pmu.h>
+#include <nvgpu/acr/nvgpu_acr.h>
 
-#endif /* NVGPU_BUG_H */
+#include "gm20b/acr_gm20b.h"
+#include "acr_gp10b.h"
+
+static void gp10b_acr_default_sw_init(struct gk20a *g, struct hs_acr *hs_acr)
+{
+	nvgpu_log_fn(g, " ");
+
+	/* ACR HS ucode type & f/w name*/
+	hs_acr->acr_type = ACR_DEFAULT;
+
+	if (!g->ops.pmu.is_debug_mode_enabled(g)) {
+		hs_acr->acr_fw_name = HSBIN_ACR_PROD_UCODE;
+	} else {
+		hs_acr->acr_fw_name = HSBIN_ACR_DBG_UCODE;
+	}
+}
+
+void nvgpu_gp10b_acr_sw_init(struct gk20a *g, struct nvgpu_acr *acr)
+{
+	nvgpu_log_fn(g, " ");
+
+	/* inherit the gm20b config data */
+	nvgpu_gm20b_acr_sw_init(g, acr);
+	gp10b_acr_default_sw_init(g, &acr->acr);
+}

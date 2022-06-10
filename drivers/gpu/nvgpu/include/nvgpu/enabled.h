@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2017-2022, NVIDIA CORPORATION.  All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -85,16 +85,21 @@ struct gk20a;
 #define NVGPU_MM_USE_PHYSICAL_SG		27
 /* WAR for gm20b chips. */
 #define NVGPU_MM_FORCE_128K_PMU_VM		28
-
+/* SW ERRATA to disable L3 alloc Bit of the physical address.
+ * Bit number varies between SOCs.
+ * E.g. 64GB physical RAM support for gv11b requires this SW errata
+ * to be enabled.
+ */
+#define NVGPU_DISABLE_L3_SUPPORT		29
 /*
  * Host flags
  */
 #define NVGPU_HAS_SYNCPOINTS			30
 /* sync fence FDs are available in, e.g., submit_gpfifo */
 #define NVGPU_SUPPORT_SYNC_FENCE_FDS		31
-/* NVGPU_IOCTL_CHANNEL_CYCLE_STATS is available */
+/* NVGPU_DBG_GPU_IOCTL_CYCLE_STATS is available */
 #define NVGPU_SUPPORT_CYCLE_STATS		32
-/* NVGPU_IOCTL_CHANNEL_CYCLE_STATS_SNAPSHOT is available */
+/* NVGPU_DBG_GPU_IOCTL_CYCLE_STATS_SNAPSHOT is available */
 #define NVGPU_SUPPORT_CYCLE_STATS_SNAPSHOT	33
 /* Both gpu driver and device support TSG */
 #define NVGPU_SUPPORT_TSG			34
